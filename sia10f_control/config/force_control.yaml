@@ -1,0 +1,54 @@
+sia10f:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+
+# Trajectory Controllers ---------------------------------------
+  joint_trajectory_controller:
+    type: position_controllers/JointTrajectoryController
+    joints:
+      - joint_s
+      - joint_l
+      - joint_e
+      - joint_u
+      - joint_r
+      - joint_b
+      - joint_t
+      - joint_sensor
+    constraints:
+      goal_time: 0.5
+      stopped_velocity_tolerance: 0.5
+      joint_s:
+        trajectory: 0.05
+        goal: 0.02
+      joint_l:
+        trajectory: 0.05
+        goal: 0.02
+      joint_e:
+        trajectory: 0.05
+        goal: 0.02
+      joint_u:
+        trajectory: 0.05
+        goal: 0.02
+      joint_r:
+        trajectory: 0.05
+        goal: 0.02
+      joint_b:
+        trajectory: 0.05
+        goal: 0.02
+      joint_t:
+        goal: 0.001
+      joint_sensor: 
+        trajectory: 0
+        goal: 0
+    gains:
+      joint_s: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_l: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_e: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_u: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_r: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_b: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_t: {p: 100, d: 0, i: 1, i_clamp: 1}
+      joint_sensor: {p: 100, d: 0, i: 1, i_clamp: 1}
+    state_publish_rate: 25
