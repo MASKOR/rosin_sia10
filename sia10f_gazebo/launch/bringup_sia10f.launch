@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <include file="$(find sia10f_gazebo)/launch/sia10f_gazebo.launch" />
+    <include file="$(find sia10f_perception)/launch/colors_of_object_array.launch" />
+    <include file="$(find sia10f_perception)/launch/ar_track_rgb.launch" />
+    <include file="$(find sia10f_perception)/launch/ork_tabletop_objects_simu.launch" />
+    <node name="set_gripper_state_server" pkg="set_gripper_state" type="set_gripper_state_server.py" output="screen" />
+
+</launch>

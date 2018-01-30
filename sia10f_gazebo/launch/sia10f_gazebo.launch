@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="sim" default="true" />
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(find sia10f_description)/urdf/sia10f.gazebo.xacro"/>
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <group if="$(arg sim)"> 
+    <node name="spawn_sia10f" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model sia10f"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="debug" value="false"/>
+      <arg name="gui" value="true"/>
+      <arg name="paused" value="true"/>
+      <arg name="use_sim_time" value="true"/>
+      <arg name="headless" value="false"/>
+    <!-- more default parameters can be changed here -->
+    </include>
+    <!--node name="spawn_kinect" pkg="gazebo_ros" type="spawn_model" args="-param robot_description_kinect -urdf -model kinect"/-->
+    <node name="spawn_green_box" pkg="gazebo_ros" type="spawn_model" args="-sdf -file $(find sia10f_description)/urdf/models/green_box/model.sdf -x -0.1 -y -0.45 -z 1 -model green_box"/>
+    <node name="spawn_red_box" pkg="gazebo_ros" type="spawn_model" args="-sdf -file $(find sia10f_description)/urdf/models/red_box/model.sdf -x 0.1 -y -0.45 -z 1 -model red_box"/>
+    <node name="spawn_blue_box" pkg="gazebo_ros" type="spawn_model" args="-sdf -file $(find sia10f_description)/urdf/models/blue_box/model.sdf -x 0.3 -y -0.45 -z 1 -model blue_box"/>
+    <node name="spawn_tag_1" pkg="gazebo_ros" type="spawn_model" args="-sdf -file $(find sia10f_description)/urdf/models/tag_1/model.sdf -x 0.0 -y -0.3 -z 1 -model tag_1"/>
+    <node name="spawn_tag_2" pkg="gazebo_ros" type="spawn_model" args="-sdf -file $(find sia10f_description)/urdf/models/tag_2/model.sdf -x 0.2 -y -0.3 -z 1 -model tag_2"/>
+    <node name="spawn_tag_3" pkg="gazebo_ros" type="spawn_model" args="-sdf -file $(find sia10f_description)/urdf/models/tag_3/model.sdf -x 0.4 -y -0.3 -z 1 -model tag_3"/>
+  </group>
+
+  <remap unless="$(arg sim)" from="/follow_joint_trajectory" to="/sia10f/joint_trajectory_controller/follow_joint_trajectory"/>
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find sia10f_control)/config/sia10f_control.yaml" command="load"/>
+  
+  <!-- load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="sia10f" args="joint_trajectory_controller joint_state_controller"/>
+
+  <include file="$(find sia10f_pc_moveit_config)/launch/moveit_planning_execution.launch.xml">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+    respawn="false" output="screen">
+    <remap from="/joint_states" to="/sia10f/joint_states"/>
+  </node>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="/use_gui" value="false"/>
+    <rosparam param="/source_list">[/sia10f/joint_states]</rosparam>
+  </node>
+
+  <include file="$(find sia10f_pc_moveit_config)/launch/moveit_rviz.launch"/>
+
+  <!-- WAREHOUSE DB -->
+  <include file="$(find sia10f_pc_moveit_config)/launch/default_warehouse_db.launch"/>
+  <node name="warehouse_python_interface" pkg="warehouse_python_interface" type="warehouse_python_interface" respawn="false" output="screen"/>
+
+  <!-- COLLABORATING ARM -->
+  <include file="$(find collaborating_arm)/launch/actioninterface.launch"/>
+
+  <node name="gripper_wrapper_motoman_to_simu" pkg="gripper_wrapper" type="gripper_wrapper_motoman_to_simu.py" output="screen"/>
+</launch>
