@@ -1,0 +1,14 @@
+<package>
+  <name>sia10f</name>
+  <version>0.0.1</version>
+  <description>This ROS Metapackage provides the Gazebo simulation environment for the Motoman SIA10F Robot arm.</description>
+  <maintainer email="limpert@fh-aachen.de">Nicolas Limpert</maintainer>
+  <license>CC-BY-NC-ND</license>
+  <author email="limpert@fh-aachen.de">Nicolas Limpert</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
